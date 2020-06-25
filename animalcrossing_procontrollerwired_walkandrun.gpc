@@ -1,11 +1,12 @@
 #pragma METAINFO("animalcrossing_procontrollerwired_walkandrun", 1, 0, "biologic")
+// if walking, dstick enabled and b button disabled
+// if running, dstick enabled and b button auto-pressed
 
 bool isRunning;
 int walkCheck;
 int runCheck;
 
-init
-{
+init {
 	isRunning = FALSE;
 	walkCheck = 0;
 	runCheck = 0;
