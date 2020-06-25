@@ -1,0 +1,52 @@
+#pragma METAINFO("animalcrossing_procontrollerwired_walkandrun", 1, 0, "biologic")
+
+bool isRunning;
+int walkCheck;
+int runCheck;
+
+init
+{
+	isRunning = FALSE;
+	walkCheck = 0;
+	runCheck = 0;
+}
+
+main {
+	if (get_val(GYRO_1_Z) < -4.0 || get_val(GYRO_1_Z) > 4.0 || get_val(ACCEL_1_Z) > -2.0 || get_val(ACCEL_1_Z) < -35.0) {
+		walkCheck = 1000;
+	} else {
+		walkCheck--;
+	}
+	
+	if (get_val(GYRO_1_Z) < -12.0 || get_val(GYRO_1_Z) > 12.0) {
+		runCheck = 1000;
+	} else {
+		runCheck--;
+	}
+
+	if (walkCheck < 850) {
+		set_val(STICK_2_X, 0.0);
+		set_val(STICK_2_Y, 0.0);
+	}
+	
+	if (walkCheck >= 850 && runCheck < 700) {
+		set_val(BUTTON_16, 0.0);
+	}
+	
+	if (runCheck >= 700 && dstickPressed()) {
+		set_val(BUTTON_16, 100.0);
+	}
+	
+	if (walkCheck < 0) {
+		walkCheck = 0;
+	}
+	
+	if (runCheck < 0) {
+		runCheck = 0;
+	}
+}
+
+// TODO doesn't work
+bool dstickPressed() {
+	return get_val(STICK_2_X) > 3.0 || get_val(STICK_2_X) < -3.0 || get_val(STICK_2_Y) > 3.0 || get_val(STICK_2_Y) < -3.0;
+}
