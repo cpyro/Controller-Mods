@@ -1,0 +1,94 @@
+#pragma METAINFO("run_legstrapdpad", 1, 0, "biologic")
+
+
+
+/*
+Ring Fit mod for Animal crossing
+Inputs below:
+Punch with hand joycon to press "A"
+Squat while holding ZR or R to open menus
+
+-
+
+*/
+
+
+
+
+bool isRunning;
+
+// Combo Timers
+
+int runCheck;
+int valueCheckFreq;
+
+init
+{
+
+	isRunning = FALSE;
+
+	runCheck = 0;
+	valueCheckFreq = 0;
+}
+
+
+
+main 
+{
+	
+// ShadowBox to press "A"
+		if(get_val(ACCEL_2_Y) > 50.0)
+			{
+				set_val(BUTTON_15, 100.0);
+			}
+			
+	nowRunning();
+			
+/*turn off buttons if i'm not running
+70 is a magic number that sets a pace for the user to be running at for 
+the controller's joystick to be activated
+increase if you want to run harder, decrease if you want to run less
+*/
+	if(runCheck < 90)
+		{
+		set_val(BUTTON_10, 0.0);
+		set_val(BUTTON_11, 0.0);
+		set_val(BUTTON_12, 0.0);
+		set_val(BUTTON_13, 0.0);
+			
+		}
+	
+// resets variable if it goes under 0
+	if(runCheck <0)
+		{
+			runCheck = 0;
+		}
+
+//debug();
+
+}
+
+// the command to let me do things only if I'm running
+// This function checks if the joycons are shaking in your legstrap due to running
+void nowRunning()
+{
+	if(get_val(ACCEL_1_Y) < -30.6)
+		{
+			runCheck = 100;	
+				
+		}
+	if(get_val(ACCEL_1_Y) < -23.8 && get_val(ACCEL_1_Y) > -24.6)
+		{
+			runCheck--;
+		}
+
+}
+
+
+
+
+void debug()
+{
+	printf("%d", runCheck);
+	
+}
