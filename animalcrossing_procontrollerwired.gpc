@@ -1,0 +1,28 @@
+#pragma METAINFO("animalcrossing_procontrollerwired", 1, 0, "biologic")
+// if walking, dstick enabled and b button disabled
+// if running, dstick enabled and b button auto-pressed
+
+bool isRunning;
+int runCheck;
+
+init {
+	isRunning = FALSE;
+	runCheck = 0;
+}
+
+main {
+	if (get_val(GYRO_1_Z) < -12.0 || get_val(GYRO_1_Z) > 12.0) {
+		runCheck = 1000;
+	} else {
+		runCheck--;
+	}
+
+	if (runCheck < 700) {
+		set_val(STICK_2_X, 0.0);
+		set_val(STICK_2_Y, 0.0);
+	}
+	
+	if (runCheck < 0) {
+		runCheck = 0;
+	}
+}

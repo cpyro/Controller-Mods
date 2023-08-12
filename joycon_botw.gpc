@@ -1,0 +1,192 @@
+#pragma METAINFO("joycon_Workout_RunLess", 0, 90, "<Super Louis 64>")
+
+
+/*
+Welcome to the 0.90 version of the code. The script needs some clean up, you can
+tell by how many magic numbers I use and the amount of throw-away variables
+left over from previous tests. I'll try to leave as many comments as possible.
+
+Goal for 1.0:
+- Get rid of magic number for changable variables
+- Fix lock-on
+- Determine a more reliable method for running
+- fix zoom-in issue
+- Determine a cheaper option for y'all
+    - Seriously, this is almost a $200 mod with this method
+- Create a marco to switch between Hard mode (run for everything) and this mode
+
+For references of what each BUTTON_X is, press F1. Refer to 
+https://cdn-images-1.medium.com/max/1200/1*aruiTcq0TUdr_jl5D4GzKw.jpeg
+for botw Controls
+
+DM @SuperLouis_64 if you need any help. 
+
+*/
+
+fix32 forwardTrack; // variable to track moving forward
+fix32 forwardUnit; // all the math done
+bool controllerON;
+bool isRunning;
+
+// Combo Timers
+
+int runCheck;
+
+init
+{
+	controllerON = FALSE;
+	isRunning = FALSE;
+	
+	
+	// remap sticks so you can run with the right joycon.
+	remapper_swap(STICK_2_X, STICK_1_X);
+	remapper_swap(STICK_2_Y, STICK_1_Y);
+	runCheck = 0;
+}
+
+
+
+main 
+{
+	// this program deals with checking runs, explained after main()
+	nowRunning();
+	
+	//if you are underneath the pace threshold, do this
+	if(runCheck < 70)
+		{
+			set_val(STICK_2_X, 0.0); // turns off joystick movement
+			set_val(STICK_2_Y, 0.0); // turns off joystick movement
+			
+			if(get_val(BUTTON_3) > 0.0) // switch the + button with -
+				{
+					set_val(BUTTON_3, 0.0); 
+					set_val(BUTTON_2, 100.0);
+				}
+				
+			if(get_val(BUTTON_6) > 0.0) // switch the RS (right thumbstick down) to B button
+					{
+						set_val(BUTTON_6, 0.0);
+						set_val(BUTTON_16, 100.0);
+					}
+			
+		}
+			
+		
+	// if you are running or above pace, do this
+	if(runCheck >= 70)
+		{					
+			// -27 to jump GYRO_1_X, when the ringon is violently shaken
+				if(get_val(GYRO_1_X) < -40.0)
+					{
+						set_val(BUTTON_14, 100.0); // jump button: X
+					}
+					
+			//Aceel_2_Y > -2 and Acell_2_z > 20
+				if(get_val(ACCEL_2_Y) > -2.0 && get_val(ACCEL_2_Z) > 20.0)
+					{
+						set_val(BUTTON_8, 100.0); // ZL aka lockon
+					}
+					
+		}
+		
+/*
+///////////////////////////////////////////////		
+Below is just a mash-up of button swaps
+This allows the user to play with just one joycon
+
+the magic numbers are based off of personal tests
+///////////////////////////////////////////////
+*/
+		
+// squeeze Ringcon, attack
+	if(get_val(ACCEL_2_X) < -25.0)
+		{
+			set_val(BUTTON_17, 100.0); // activate Y button
+		}		
+		
+// Home Button to use L items
+		if(get_val(BUTTON_1) > 0.0) 
+			{
+				set_val(BUTTON_1, 0.0); //Home button
+				set_val(BUTTON_7, 100.0); // L button
+			}
+			
+//bow with B to ZR 
+		if(get_val(BUTTON_16) > 0.0)
+			{
+				set_val(BUTTON_16, 0.0); // B button
+				set_val(BUTTON_5, 100.0); // ZR button, Use Bow
+			}
+			
+//RS button to sprint
+		if(get_val(BUTTON_6) > 0.0)
+			{
+				set_val(BUTTON_6, 0.0); //RS button press
+				set_val(BUTTON_16, 100.0); // b button
+			}
+
+// sheika menu, Plus button switch to Minus
+	if(get_val(BUTTON_3) > 0.0)
+		{
+			set_val(BUTTON_3, 0.0); //+ button
+			set_val(BUTTON_2, 100.0); // activate - button
+		}
+
+/* Squating is sneaky, when the legstrap is horizontal, it activates
+the only time your leg can be horizontal is squating, mess with -25 to fit
+your prefences 
+*/ 
+	if(get_val(ACCEL_1_Z) == -25.00 && runCheck < 30) // activate when not running
+		{
+			set_val(BUTTON_3, 100.0);
+		}
+		
+	if(runCheck <0) // if the run variable is less than 0, keep it at 0
+		{
+			runCheck = 0;
+		}
+
+//debug();
+
+}
+
+/*
+	Quick explanation for how my duct-tape run checks are done
+	Whenever you "run" my program sets the variable to runCheck = 100
+	every tick, the variable is reduced by -- (1)
+	This way there isn't an immediate loss of movement in-game 
+	There are definitely better way to do this with better math
+	Plans to update this later on
+
+*/
+void nowRunning()
+{
+	if(get_val(ACCEL_1_Y) < -30.6)
+		{
+			runCheck = 100;	
+				
+		}
+	if(get_val(ACCEL_1_Y) < -23.8 && get_val(ACCEL_1_Y) > -24.6)
+		{
+			runCheck--;
+		}
+
+}
+
+// turns off all buttons so nothing can come out, turned off for now
+void disableButtons() 
+{
+    uint8 i = BUTTON_1;
+ 
+    for(; i<=BUTTON_21; ++i) {
+        set_val(i, 0.0);
+    }
+}
+
+
+// debug check for my runCheck
+void debug()
+{
+	printf("%d", runCheck);
+	
+}

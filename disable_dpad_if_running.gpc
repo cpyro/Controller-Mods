@@ -1,0 +1,32 @@
+#pragma METAINFO("disable_dpad_if_running", 1, 0, "biologic")
+
+bool isRunning;
+int runCheck;
+
+init
+{
+	isRunning = FALSE;
+	runCheck = 0;
+}
+
+main {
+	if (get_val(GYRO_1_Z) < -8.0 || get_val(GYRO_1_Z) > 8.0) {
+		runCheck = 1000;
+	} else {
+		runCheck--;
+	}
+  
+	if (runCheck < 700) {
+		set_val(BUTTON_10, 0.0);
+		set_val(BUTTON_11, 0.0);
+		set_val(BUTTON_12, 0.0);
+		set_val(BUTTON_13, 0.0);
+	}
+	
+	if (runCheck < 0) {
+		runCheck = 0;
+	}
+	printf("%d", runCheck);
+	printf("%d", GYRO_1_Z);
+	printf("%d", get_val(GYRO_1_Z));
+}

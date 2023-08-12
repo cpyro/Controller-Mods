@@ -1,12 +1,11 @@
-#pragma METAINFO("animalcrossing_procontrollerwired_walkandrun", 1, 0, "biologic")
-// if walking, dstick enabled and b button disabled
-// if running, dstick enabled and b button auto-pressed
+#pragma METAINFO("walk_and_run", 1, 0, "biologic")
 
 bool isRunning;
 int walkCheck;
 int runCheck;
 
-init {
+init
+{
 	isRunning = FALSE;
 	walkCheck = 0;
 	runCheck = 0;
@@ -25,16 +24,21 @@ main {
 		runCheck--;
 	}
 
-	if (walkCheck < 850) {
-		set_val(STICK_2_X, 0.0);
-		set_val(STICK_2_Y, 0.0);
+	if (walkCheck < 700) {
+		// disable dpad
+		set_val(BUTTON_10, 0.0);
+		set_val(BUTTON_11, 0.0);
+		set_val(BUTTON_12, 0.0);
+		set_val(BUTTON_13, 0.0);
+		// enable B button
+		// TODO
 	}
 	
 	if (walkCheck >= 850 && runCheck < 700) {
 		set_val(BUTTON_16, 0.0);
 	}
 	
-	if (runCheck >= 700 && dstickPressed()) {
+	if (runCheck >= 700 && dpadPressed()) {
 		set_val(BUTTON_16, 100.0);
 	}
 	
@@ -45,9 +49,13 @@ main {
 	if (runCheck < 0) {
 		runCheck = 0;
 	}
+
+	// printf("%d", walkCheck);
+	// printf("%d", GYRO_1_Z);
+	// printf("%d", get_val(GYRO_1_Z));
 }
 
-// TODO doesn't work
-bool dstickPressed() {
-	return get_val(STICK_2_X) > 3.0 || get_val(STICK_2_X) < -3.0 || get_val(STICK_2_Y) > 3.0 || get_val(STICK_2_Y) < -3.0;
+bool dpadPressed() {
+	return get_val(BUTTON_10) == 100.0 || get_val(BUTTON_11) == 100.0
+			|| get_val(BUTTON_12) == 100.0 || get_val(BUTTON_13) == 100.0 ;
 }
